@@ -1,0 +1,28 @@
+id = "herdr-zcode"
+name = "Herdr ZCode"
+version = "0.1.0"
+min_herdr_version = "0.9.2"
+license = "MIT"
+description = "ZCode agent support: reports zcode pane state (working/blocked/idle) to herdr and enables session restore"
+platforms = ["macos", "linux", "windows"]
+
+[[startup]]
+command = ["node", "scripts/manage_hooks.js", "install"]
+
+[[actions]]
+id = "install-hooks"
+title = "Install ZCode integration hooks"
+contexts = ["workspace"]
+command = ["node", "scripts/manage_hooks.js", "install"]
+
+[[actions]]
+id = "remove-hooks"
+title = "Remove ZCode integration hooks"
+contexts = ["workspace"]
+command = ["node", "scripts/manage_hooks.js", "remove"]
+
+[[actions]]
+id = "status"
+title = "Show ZCode integration status"
+contexts = ["workspace"]
+command = ["node", "scripts/manage_hooks.js", "status"]
