@@ -25,12 +25,12 @@ Works on macOS, Linux and Windows.
 
 ## Install
 
-From GitHub (appears in Herdr's plugin index once this repo is tagged
-`herdr-plugin`):
-
 ```bash
-herdr plugin install <owner>/herdr-zcode
+herdr plugin install ichadhr/herdr-zcode
 ```
+
+The repo is tagged `herdr-plugin`, so it also appears in Herdr's plugin
+marketplace index.
 
 Local development:
 
