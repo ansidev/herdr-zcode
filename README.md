@@ -9,7 +9,7 @@ reattached after a Herdr restart.
 Herdr cannot recognize zcode by itself — it is not in Herdr's built-in agent
 list. Instead, this plugin uses Herdr's official self-reporting API
 ([add-herdr-support](https://herdr.dev/docs/add-herdr-support/)): it registers
-lifecycle hooks in zcode's settings file (`~/.zcode/cli/setting.json`) that
+lifecycle hooks in zcode's settings file (`~/.zcode/cli/config.json`) that
 report pane state to Herdr as zcode runs. Outside Herdr panes the hooks are
 no-ops.
 
@@ -44,7 +44,7 @@ herdr plugin link /path/to/herdr-zcode
   a copy of the reporter script in the plugin's config dir and registers it on
   all zcode hook events (`SessionStart`, `UserPromptSubmit`, `PreToolUse`,
   `PermissionRequest`, `PostToolUse`, `PostToolUseFailure`, `Stop`) in
-  `~/.zcode/cli/setting.json`. Idempotent — safe to run repeatedly, replaces
+  `~/.zcode/cli/config.json`. Idempotent — safe to run repeatedly, replaces
   older copies of the same integration.
 - **State mapping**: prompt submit / tool start / tool end → `working`;
   permission request → `blocked`; turn stop / session start → `idle`.
@@ -73,7 +73,7 @@ Then start `zcode` in a Herdr pane and submit a prompt — the pane appears as a
   [kingsword09/zcode-cli](https://github.com/kingsword09/zcode-cli)
   (`npm install -g zcode-app-cli`). Compatibility with other zcode
   distributions depends on them sharing the same hook events
-  (`hooks.events.*` in `~/.zcode/cli/setting.json`) and settings path.
+  (`hooks.events.*` in `~/.zcode/cli/config.json`) and settings path.
 - Plugins run unsandboxed with full CLI access. Review
   `scripts/manage_hooks.js` and `hooks/herdr_agent_state.js` — they only touch
   the zcode settings file and call `herdr pane report-agent*`.

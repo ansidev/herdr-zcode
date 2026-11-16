@@ -46,10 +46,13 @@ function envDir(name) {
 }
 
 function settingsPath() {
-  const override = (process.env.ZCODE_CLI_SETTINGS_FILE || "").trim();
+  // zcode executes user hooks only from ~/.zcode/cli/config.json;
+  // setting.json is the legacy read-only file.
+  const override =
+    (process.env.ZCODE_CLI_CONFIG_FILE || process.env.ZCODE_CLI_SETTINGS_FILE || "").trim();
   return override
     ? path.resolve(override)
-    : path.join(os.homedir(), ".zcode", "cli", "setting.json");
+    : path.join(os.homedir(), ".zcode", "cli", "config.json");
 }
 
 function loadSettings(p) {
