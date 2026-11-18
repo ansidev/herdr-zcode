@@ -26,7 +26,7 @@ Works on macOS, Linux and Windows.
 ## Install
 
 ```bash
-herdr plugin install ichadhr/herdr-zcode
+herdr plugin install ansidev/herdr-zcode
 ```
 
 The repo is tagged `herdr-plugin`, so it also appears in Herdr's plugin
@@ -77,3 +77,11 @@ Then start `zcode` in a Herdr pane and submit a prompt — the pane appears as a
 - Plugins run unsandboxed with full CLI access. Review
   `scripts/manage_hooks.js` and `hooks/herdr_agent_state.js` — they only touch
   the zcode settings file and call `herdr pane report-agent*`.
+
+## Credits
+
+Fork of [ichadhr/herdr-zcode](https://github.com/ichadhr/herdr-zcode) by
+[ichadhr](https://github.com/ichadhr), which designed and built the whole
+zcode → herdr self-reporting integration. Maintained here by
+[Le Minh Tri (ansidev)](https://github.com/ansidev). Both projects are MIT
+licensed; see [LICENSE](LICENSE).
