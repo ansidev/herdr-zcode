@@ -84,11 +84,36 @@ function nextSeq() {
   return String(seq);
 }
 
+const TURN_FILE = path.join(__dirname, "herdr_agent_state.turn");
+
+function dbPath() {
+  const override = (process.env.ZCODE_SESSION_DB_PATH || "").trim();
+  return override ? path.resolve(override) : path.join(process.env.HOME || "", ".zcode", "cli", "db", "db.sqlite");
+}
+
+function hasLiveChildren(sessionId, turnStart) {
+  if (!sessionId) return false;
+  let db;
+  try {
+    const { DatabaseSync } = require("node:sqlite");
+    db = new DatabaseSync(dbPath(), { readOnly: true });
+    db.exec("PRAGMA busy_timeout=200");
+    const row = db
+      .prepare(
+        "SELECT 1 AS ok FROM session WHERE parent_id = ? AND task_type = 'subagent_child' AND last_outcome IS NULL AND time_updated >= ? LIMIT 1"
+      )
+      .get(sessionId, turnStart || 0);
+    return !!row;
+  } catch {
+    return false;
+  } finally {
+    try { if (db) db.close(); } catch { /* ignore */ }
+  }
+}
+
 function main() {
   if (process.env.HERDR_ENV !== "1" || !process.env.HERDR_PANE_ID) return;
   const hook = readHookInput();
-  // Subagent activity does not drive the top-level pane state.
-  if (hook.agent_id) return;
 
   const state = EVENT_STATES[hook.hook_event_name];
   if (!state) return;
@@ -99,6 +124,18 @@ function main() {
     "pane", "report-agent", paneId,
     "--source", SOURCE, "--agent", AGENT, "--seq", nextSeq(),
   ];
+
+  // Track turn start for stale-child filtering.
+  if (hook.hook_event_name === "UserPromptSubmit") {
+    try { fs.writeFileSync(TURN_FILE, String(Date.now())); } catch { /* ignore */ }
+  }
+
+  let reportState = state;
+  if (hook.hook_event_name === "Stop") {
+    let turnStart = 0;
+    try { turnStart = parseInt(fs.readFileSync(TURN_FILE, "utf8"), 10) || 0; } catch { /* ignore */ }
+    if (hasLiveChildren(sessionId, turnStart)) reportState = "working";
+  }
 
   // Session report and state report each get their own increasing seq:
   // herdr drops any report whose seq is not higher than the previous one.
@@ -111,7 +148,7 @@ function main() {
     ]);
   }
 
-  const args = [...base, "--state", state];
+  const args = [...base, "--state", reportState];
   // Explain the block so herdr's UI can show why the agent is waiting.
   if (hook.hook_event_name === "PermissionRequest" &&
       typeof hook.tool_name === "string" && hook.tool_name) {
